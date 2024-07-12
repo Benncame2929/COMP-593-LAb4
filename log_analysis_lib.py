@@ -12,25 +12,23 @@ def main():
     # Get the log file path from the command line
     log_path = get_file_path_from_cmd_line()
 
-    # TODO: Use filter_log_by_regex() to investigate the gateway log per Step 5
-
-    # TODO: Use filter_log_by_regex() to extract data from the gateway log per Step 6
-
+    
     return
 
 def get_file_path_from_cmd_line(param_num=1):
-    """Gets a file path from a command line parameter.
+    
+    if len(sys.argv) <= param_num:
+        print(f'Error: Missing log file path at command line parameter {param_num}.')
+        sys.exit('Terminating script.')
+    
+    log_path = os.path.abspath(sys.argv[param_num])
+    if not os.path.isfile(log_path):
+        print(f'Error: The path "{log_path}" does not refer to a valid file.')
+        sys.exit('Terminating script.')
 
-    Exits script execution if no file path is specified as a command 
-    line parameter or the specified path is not for an existing file.
 
-    Args:
-        param_num (int): Parameter number from which to look for file path. Defaults to 1.
 
-    Returns:
-        str: File path
-    """
-    # TODO: Implement the function body per Step 3
+    
     return
 
 def filter_log_by_regex(log_path, regex, ignore_case=True, print_summary=False, print_records=False):
