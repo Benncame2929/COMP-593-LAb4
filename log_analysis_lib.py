@@ -26,8 +26,9 @@ def get_file_path_from_cmd_line(param_num=1):
         print(f'Error: The path "{log_path}" does not refer to a valid file.')
         sys.exit('Terminating script.')
 
+    return log_path
 
-
+    
     
     return
 
