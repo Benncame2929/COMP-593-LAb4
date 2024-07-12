@@ -1,35 +1,27 @@
 import re
 import pandas as pd
-import log_analysis_lib
-
-# Get the log file path from the command line
-# Because this is outside of any function, log_path is a global variable
-log_path = log_analysis_lib.get_file_path_from_cmd_line()
+from log_analysis_lib import get_file_path_from_cmd_line(1), filter_log_by_regex
 
 def main():
-    log_file = obtain_log_file_path(1)
-    port_traffic = analyze_port_traffic(log_file)
+    log_file = get_file_path_from_cmd_line()
+    port_traffic = tally_port_traffic(log_file)
     for port, count in port_traffic.items():
         if count >= 100:
-            create_port_traffic_report(log_file, port)
-    report_invalid_user_logins(log_file)
+            generate_port_traffic_report(log_file, port)
+    generate_invalid_user_report(log_file)
     log_records_from_source_ip(log_file, '220.195.35.40')
 
-
-def analyze_port_traffic(log_file):
+def tally_port_traffic(log_file):
     port_counts = {}
     with open(log_file, 'r') as file:
         for line in file:
             match = re.search(r'DPT=(\d+)', line)
             if match:
                 port = match.group(1)
-                if port in port_counts:
-                    port_counts[port] += 1
-                else:
-                    port_counts[port] = 1
+                port_counts[port] = port_counts.get(port, 0) + 1
     return port_counts
 
-def create_port_traffic_report(log_file, port_number):
+def generate_port_traffic_report(log_file, port_number):
     report_entries = []
     with open(log_file, 'r') as file:
         for line in file:
@@ -40,8 +32,7 @@ def create_port_traffic_report(log_file, port_number):
     report_df = pd.DataFrame(report_entries, columns=['Date', 'Time', 'Source IP', 'Destination IP', 'Source Port', 'Destination Port'])
     report_df.to_csv(f'destination_port_{port_number}_report.csv', index=False)
 
-
-def report_invalid_user_logins(log_file):
+def generate_invalid_user_report(log_file):
     invalid_logins = []
     with open(log_file, 'r') as file:
         for line in file:
