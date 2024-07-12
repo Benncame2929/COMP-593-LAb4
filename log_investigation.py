@@ -1,13 +1,5 @@
-"""
-Description:
- Generates various reports from a gateway log file.
-
-Usage:
- python log_investigation.py log_path
-
-Parameters:
- log_path = Path of the gateway log file
-"""
+import re
+import pandas as pd
 import log_analysis_lib
 
 # Get the log file path from the command line
@@ -15,19 +7,14 @@ import log_analysis_lib
 log_path = log_analysis_lib.get_file_path_from_cmd_line()
 
 def main():
-    # Determine how much traffic is on each port
-    port_traffic = tally_port_traffic()
-
-    # Per step 9, generate reports for ports that have 100 or more records
+    log_file = obtain_log_file_path(1)
+    port_traffic = analyze_port_traffic(log_file)
     for port, count in port_traffic.items():
         if count >= 100:
-            generate_port_traffic_report(port)
+            create_port_traffic_report(log_file, port)
+    report_invalid_user_logins(log_file)
+    log_records_from_source_ip(log_file, '220.195.35.40')
 
-    # Generate report of invalid user login attempts
-    generate_invalid_user_report()
-
-    # Generate log of records from source IP 220.195.35.40
-    generate_source_ip_log('220.195.35.40')
 
 def tally_port_traffic():
     """Produces a dictionary of destination port numbers (key) that appear in a 
