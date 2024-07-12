@@ -16,27 +16,30 @@ def main():
     log_records_from_source_ip(log_file, '220.195.35.40')
 
 
-def tally_port_traffic():
-    """Produces a dictionary of destination port numbers (key) that appear in a 
-    specified log file and a count of how many times they appear (value)
+def analyze_port_traffic(log_file):
+    port_counts = {}
+    with open(log_file, 'r') as file:
+        for line in file:
+            match = re.search(r'DPT=(\d+)', line)
+            if match:
+                port = match.group(1)
+                if port in port_counts:
+                    port_counts[port] += 1
+                else:
+                    port_counts[port] = 1
+    return port_counts
 
-    Returns:
-        dict: Dictionary of destination port number counts
-    """
-    # TODO: Complete function body per step 7
-    return {}
+def create_port_traffic_report(log_file, port_number):
+    report_entries = []
+    with open(log_file, 'r') as file:
+        for line in file:
+            match = re.search(r'^(.{6}) (\d\d:\d\d:\d\d).*SRC=(.+?) DST=(.+?) .*SPT=(.+?) DPT=' + f"({port_number})", line)
+            if match:
+                date, time, src_ip, dst_ip, src_port, dst_port = match.groups()
+                report_entries.append((date, time, src_ip, dst_ip, src_port, dst_port))
+    report_df = pd.DataFrame(report_entries, columns=['Date', 'Time', 'Source IP', 'Destination IP', 'Source Port', 'Destination Port'])
+    report_df.to_csv(f'destination_port_{port_number}_report.csv', index=False)
 
-def generate_port_traffic_report(port_number):
-    """Produces a CSV report of all network traffic in a log file for a specified 
-    destination port number.
-
-    Args:
-        port_number (str or int): Destination port number
-    """
-    # TODO: Complete function body per step 8
-    # Get data from records that contain the specified destination port
-    # Generate the CSV report
-    return
 
 def generate_invalid_user_report():
     """Produces a CSV report of all network traffic in a log file that show
