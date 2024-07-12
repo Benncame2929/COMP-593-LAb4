@@ -41,14 +41,16 @@ def create_port_traffic_report(log_file, port_number):
     report_df.to_csv(f'destination_port_{port_number}_report.csv', index=False)
 
 
-def generate_invalid_user_report():
-    """Produces a CSV report of all network traffic in a log file that show
-    an attempt to login as an invalid user.
-    """
-    # TODO: Complete function body per step 10
-    # Get data from records that show attempted invalid user login
-    # Generate the CSV report
-    return
+def report_invalid_user_logins(log_file):
+    invalid_logins = []
+    with open(log_file, 'r') as file:
+        for line in file:
+            match = re.search(r'^(.{6}) (\d\d:\d\d:\d\d).*Invalid user (\w+) from (.*)', line)
+            if match:
+                date, time, username, ip_address = match.groups()
+                invalid_logins.append((date, time, username, ip_address))
+    report_df = pd.DataFrame(invalid_logins, columns=['Date', 'Time', 'Username', 'IP Address'])
+    report_df.to_csv('invalid_users.csv', index=False)
 
 def generate_source_ip_log(ip_address):
     """Produces a plain text .log file containing all records from a source log
