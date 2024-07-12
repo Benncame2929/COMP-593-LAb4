@@ -52,17 +52,16 @@ def report_invalid_user_logins(log_file):
     report_df = pd.DataFrame(invalid_logins, columns=['Date', 'Time', 'Username', 'IP Address'])
     report_df.to_csv('invalid_users.csv', index=False)
 
-def generate_source_ip_log(ip_address):
-    """Produces a plain text .log file containing all records from a source log
-    file that contain a specified source IP address.
-
-    Args:
-        ip_address (str): Source IP address
-    """
-    # TODO: Complete function body per step 11
-    # Get all records that have the specified source IP address
-    # Save all records to a plain text .log file
-    return
+def log_records_from_source_ip(log_file, ip_address):
+    matching_records = []
+    with open(log_file, 'r') as file:
+        for line in file:
+            if f'SRC={ip_address}' in line:
+                matching_records.append(line.strip())
+    output_file_name = f'source_ip_{ip_address.replace(".", "_")}.log'
+    with open(output_file_name, 'w') as output_file:
+        for record in matching_records:
+            output_file.write(record + '\n')
 
 if __name__ == '__main__':
     main()
